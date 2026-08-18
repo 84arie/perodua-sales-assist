@@ -2213,6 +2213,46 @@ body{
   .live-toolbar .btn{min-width:0!important;font-size:10.5px!important;padding:9px 4px!important}
 }
 
+
+/* V3 COMPLETE DEVICE PROTECTION */
+.device-row{align-items:flex-start!important}
+.device-info-block{min-width:0;flex:1}
+.device-stats{display:grid;gap:3px;margin-top:5px}
+.device-stat{font-size:10px;color:#6d7b8d;line-height:1.35}
+.device-change-btn{
+  border:1px solid #c9d9eb;background:#f3f7fb;color:#003B7A;border-radius:9px;
+  padding:7px 9px;font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap
+}
+.device-change-btn:disabled{opacity:.48;cursor:not-allowed}
+.device-limit-banner{
+  margin:8px 0 4px;padding:9px 10px;border-radius:11px;background:#fff6f6;
+  border:1px solid #f3cdd0;color:#9b2530;font-size:10.5px;line-height:1.4;font-weight:700
+}
+#deviceConfirmModal{
+  position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;
+  padding:16px;background:rgba(12,25,42,.55);backdrop-filter:blur(4px)
+}
+#deviceConfirmModal.show{display:flex}
+.device-confirm-card{
+  width:min(420px,100%);background:#fff;border-radius:20px;padding:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.22)
+}
+.device-confirm-card h3{margin:0 0 8px;color:#003B7A;font-size:19px;font-weight:950}
+.device-confirm-card p{margin:0;color:#5b6879;font-size:12px;line-height:1.55}
+.device-confirm-warning{
+  margin-top:12px!important;padding:10px 12px;border-radius:12px;background:#fff7ef;
+  border:1px solid #f0d8bd;color:#7d4c14!important;font-weight:800
+}
+.device-confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.device-confirm-actions button{min-height:44px;border:0;border-radius:11px;font-size:12px;font-weight:900;cursor:pointer}
+#cancelDeviceChangeBtn{background:#eef4f9;color:#003B7A}
+#confirmDeviceChangeBtn{background:linear-gradient(90deg,#D71E28,#B91820);color:#fff}
+@media(max-width:520px){
+  .device-row{flex-direction:column}
+  .device-change-btn{width:100%}
+  .device-confirm-actions{grid-template-columns:1fr}
+}
+
 </style>
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -2232,34 +2272,37 @@ body{
       <div>
         <span class="env-badge" id="envBadge">ENV</span>
         <h2 class="access-title">PERODUA SALES ASSIST</h2>
-        <p class="access-sub">1 user · maksimum 2 device · tukar device sendiri</p>
+        <p class="access-sub">1 pengguna · maksimum 2 peranti · pengurusan peranti kendiri</p>
       </div>
     </div>
 
     <div class="access-field">
-      <label>User ID / License ID</label>
+      <label>ID Pengguna / ID Lesen</label>
       <input id="licenseIdInput" type="text" autocomplete="username" placeholder="Contoh: PSA001">
     </div>
 
     <div class="access-field">
-      <label>PIN / Password</label>
+      <label>PIN / Kata Laluan</label>
       <input id="licensePinInput" type="password" autocomplete="current-password" placeholder="••••••">
     </div>
 
     <div class="access-actions">
-      <button class="access-btn primary" id="accessLoginBtn">Login</button>
-      <button class="access-btn secondary" id="accessLogoutBtn" style="display:none">Logout</button>
+      <button class="access-btn primary" id="accessLog MasukBtn">Log Masuk</button>
+      <button class="access-btn secondary" id="accessLog KeluarBtn" style="display:none">Log Keluar</button>
     </div>
 
-    <div id="accessStatus" class="access-status">Sila login untuk akses app.</div>
+    <div id="accessStatus" class="access-status">Sila log masuk untuk mengakses aplikasi.</div>
 
     <div id="deviceManager" class="device-manager" style="display:none">
-      <h3>Device Aktif Saya</h3>
+      <h3>Peranti Aktif Saya</h3>
+      <div id="deviceChangeInfo" class="device-meta" style="margin-bottom:8px">
+        Pertukaran peranti dibenarkan sekali setiap 7 hari.
+      </div>
       <div id="deviceList"></div>
     </div>
 
     <div class="access-note">
-      Kalau dah guna 2 device, remove salah satu device lama dahulu. Selepas slot kosong, login pada device baru. Admin tak perlu reset device customer setiap kali.
+      Setiap akaun boleh menggunakan maksimum 2 peranti. Pertukaran satu peranti dibenarkan sekali dalam tempoh 7 hari dan boleh diurus sendiri tanpa bantuan pentadbir.
     </div>
   </div>
 </div>
@@ -2286,9 +2329,9 @@ body{
         </div>
         <div class="side-title">Menu</div>
         <div class="tabs">
-          <button class="tab active" id="tabQuick">Quick Check</button>
-          <button class="tab" id="tabCalc">Loan Calculator</button>
-          <button class="tab" id="tabBudget">Budget Finder</button>
+          <button class="tab active" id="tabQuick">Semakan Pantas</button>
+          <button class="tab" id="tabCalc">Kalkulator Pembiayaan</button>
+          <button class="tab" id="tabBudget">Carian Bajet</button>
           <button class="tab" id="tabQual">Kelayakan</button>
         </div>
 </div>
@@ -2299,7 +2342,7 @@ body{
       <div class="live-toolbar">
         <button class="btn secondary" id="liveModeBtn">🎥 Live Mode</button>
         <button class="btn secondary" id="copyQuoteBtn">📋 Copy Quote</button>
-        <button class="btn secondary" id="manageDeviceBtn" onclick="openDeviceManager()">📱 My Devices</button>
+        <button class="btn secondary" id="manageDeviceBtn" onclick="openDeviceManager()">📱 Peranti Saya</button>
       </div>
 
       <section id="quickMode">
@@ -2308,7 +2351,7 @@ body{
             <div class="hero-left">
               <div class="cap">Ansuran bulanan paling menonjol</div>
               <div class="amt" id="quickHeroMonthly">RM0</div>
-              <div class="desc" id="quickHeroDesc">Pilih model dan variant untuk terus paparkan monthly.</div>
+              <div class="desc" id="quickHeroDesc">Pilih model dan varian untuk memaparkan anggaran ansuran bulanan.</div>
             </div>
             <div class="hero-right car-panel">
               <div class="img-caption" id="quickHeroBadge">Model Kereta</div>
@@ -2319,7 +2362,7 @@ body{
         </div>
 
         <div class="card">
-          <p class="card-title">Quick Check</p>
+          <p class="card-title">Semakan Pantas</p>
           <div class="grid2">
             <div>
               <label>Model</label>
@@ -2346,7 +2389,7 @@ body{
             <div class="hero-left">
               <div class="cap">Anggaran ansuran bulanan</div>
               <div class="amt" id="rMonthlyHero">RM0</div>
-              <div class="desc" id="rHeroDesc">Deposit boleh diubah ikut bajet pelanggan.</div>
+              <div class="desc" id="rHeroDesc">Jumlah deposit boleh diselaraskan mengikut kemampuan pelanggan.</div>
             </div>
             <div class="hero-right car-panel">
               <div class="img-caption" id="calcHeroBadge">Model Kereta</div>
@@ -2357,7 +2400,7 @@ body{
         </div>
 
         <div class="card">
-          <p class="card-title">Loan Calculator</p>
+          <p class="card-title">Kalkulator Pembiayaan</p>
           <div class="grid2">
             <div>
               <label>Model</label>
@@ -2410,7 +2453,7 @@ body{
           
 
           <div class="inline-note" style="margin-top:14px">
-            Seller live biasanya nak fokus pada “<b>berapa sebulan?</b>”. Sebab itu monthly dipaparkan paling atas dahulu.
+            Semasa sesi jualan langsung, anggaran ansuran bulanan merupakan maklumat utama. Oleh itu, nilai ini dipaparkan dengan jelas untuk rujukan pantas.
           </div>
         </div>
 
@@ -2446,19 +2489,19 @@ body{
         <div class="hero-top">
           <div class="hero-grid">
             <div class="hero-left">
-              <div class="cap">Bajet bulanan customer</div>
+              <div class="cap">Bajet bulanan pelanggan</div>
               <div class="amt" id="budgetHero">RM600</div>
-              <div class="desc">Masukkan bajet monthly. App akan shortlist model yang berada dalam bajet.</div>
+              <div class="desc">Masukkan bajet ansuran bulanan. Sistem akan menyenaraikan model yang berada dalam julat tersebut.</div>
             </div>
             <div class="hero-right car-panel">
-              <div class="img-caption">Budget Finder</div>
+              <div class="img-caption">Carian Bajet</div>
               <img id="budgetHeroImage" alt="Perodua model"/>
             </div>
           </div>
         </div>
 
         <div class="card">
-          <p class="card-title">Cari Kereta Ikut Bajet Monthly</p>
+          <p class="card-title">Cari Model Mengikut Bajet Bulanan</p>
           <div class="grid3">
             <div>
               <label>Bajet Bulanan (RM)</label>
@@ -2489,7 +2532,7 @@ body{
             <div class="hero-left">
               <div class="cap">Anggaran DSR selepas kereta baru</div>
               <div class="amt" id="qualHero">0%</div>
-              <div class="desc" id="qualHeroDesc">Masukkan gaji bersih, komitmen sedia ada dan monthly kereta.</div>
+              <div class="desc" id="qualHeroDesc">Masukkan pendapatan bersih, komitmen sedia ada dan anggaran ansuran kenderaan.</div>
             </div>
             <div class="hero-right car-panel">
               <div class="img-caption" id="qualCarBadge">Kelayakan</div>
@@ -2524,7 +2567,7 @@ body{
             </div>
           </div>
           <div class="note" style="margin-top:10px">
-            Ini anggaran awal untuk bantu seller semasa live. Ia bukan keputusan kelulusan bank.
+            Maklumat ini ialah anggaran awal untuk rujukan jualan dan bukan keputusan kelulusan rasmi pihak bank.
           </div>
         </div>
 
@@ -2532,17 +2575,17 @@ body{
           <div class="highlight-box" id="qualStatusBox">
             <div class="k">Status Anggaran</div>
             <div class="v" id="qualStatus">—</div>
-            <div class="s" id="qualStatusDesc">Masukkan maklumat customer.</div>
+            <div class="s" id="qualStatusDesc">Masukkan maklumat pelanggan.</div>
           </div>
           <div class="highlight-box blue">
-            <div class="k">Max Monthly Pada Had DSR</div>
+            <div class="k">Ansuran Maksimum Berdasarkan Had DSR</div>
             <div class="v" id="qualMaxMonthly">RM0</div>
             <div class="s" id="qualBalance">Baki selepas komitmen: RM0</div>
           </div>
         </div>
 
         <div class="card">
-          <p class="card-title">Cadangan Model Berdasarkan Monthly</p>
+          <p class="card-title">Cadangan Model Berdasarkan Ansuran Bulanan</p>
           <div id="qualResults" class="recommend-list"></div>
         </div>
       </section>
@@ -2747,7 +2790,7 @@ document.getElementById("cDeposit").addEventListener("input", e=>{
   depositSlider.value=v;
   depositSliderValue.textContent=moneyNoDec(v);
 });
-// Budget Finder
+// Carian Bajet
 function allVariants(){
   const rows=[];
   Object.entries(cars).forEach(([model,arr])=>{
@@ -2798,11 +2841,11 @@ function runQualification(){
   document.getElementById("qualHero").textContent = income ? dsr.toFixed(1)+"%" : "—";
   document.getElementById("qualHeroDesc").textContent = income
     ? `Gaji bersih ${moneyNoDec(income)} • komitmen ${moneyNoDec(existing)} • kereta ${moneyNoDec(car)}`
-    : "Masukkan gaji bersih customer.";
+    : "Masukkan pendapatan bersih pelanggan.";
 
   let status="PERLU SEMAK", desc="DSR hampir dengan had rujukan.";
   let cls="warn";
-  if(income<=0){ status="—"; desc="Masukkan gaji bersih customer."; cls="warn"; }
+  if(income<=0){ status="—"; desc="Masukkan pendapatan bersih pelanggan."; cls="warn"; }
   else if(dsr <= limit*0.75){ status="NAMPAK BAIK"; desc="Masih ada ruang berbanding had DSR rujukan."; cls="good"; }
   else if(dsr <= limit){ status="PERLU SEMAK"; desc="Masih dalam had rujukan tetapi agak hampir."; cls="warn"; }
   else { status="KOMITMEN TINGGI"; desc="Melebihi had DSR rujukan yang dipilih."; cls="high"; }
@@ -2824,11 +2867,11 @@ function runQualification(){
     <div class="recommend-item">
       <div>
         <strong>${x.model} ${x.v}</strong>
-        <div class="muted">Monthly price card 90% / 9 tahun</div>
+        <div class="muted">Ansuran kad harga 90% / 9 tahun</div>
       </div>
       <div class="monthly">${moneyNoDec(x.m90)}</div>
     </div>
-  `).join("") : '<div class="muted">Tiada model ditemui dalam anggaran monthly ini.</div>';
+  `).join("") : '<div class="muted">Tiada model ditemui dalam julat ansuran bulanan ini.</div>';
 
   const best = matches[0];
   document.getElementById("qualHeroImage").src = best ? (modelImages[best.model]||"") : modelImages["Axia"];
@@ -3483,8 +3526,17 @@ window.APP_CONFIG = {
   const statusEl = document.getElementById("accessStatus");
   const deviceManager = document.getElementById("deviceManager");
   const deviceList = document.getElementById("deviceList");
+  const deviceChangeInfo = document.getElementById("deviceChangeInfo");
   const idEl = document.getElementById("licenseIdInput");
   const pinEl = document.getElementById("licensePinInput");
+
+  const deviceConfirmModal = document.getElementById("deviceConfirmModal");
+  const deviceConfirmText = document.getElementById("deviceConfirmText");
+  const cancelDeviceChangeBtn = document.getElementById("cancelDeviceChangeBtn");
+  const confirmDeviceChangeBtn = document.getElementById("confirmDeviceChangeBtn");
+
+  let pendingDeviceChangeId = null;
+  let pendingDeviceChangeLabel = "";
 
   envBadge.textContent = env;
   document.title = cfg.appName;
@@ -3500,76 +3552,110 @@ window.APP_CONFIG = {
   }
 
   function deviceLabel(){
-    const ua = navigator.userAgent || "";
+    const ua=navigator.userAgent||"";
     if(/iPhone/i.test(ua)) return "iPhone";
     if(/iPad/i.test(ua)) return "iPad";
     if(/Android/i.test(ua)) return "Android";
     if(/Windows/i.test(ua)) return "Windows";
     if(/Macintosh|Mac OS X/i.test(ua)) return "Mac";
-    return "Browser Device";
+    return "Peranti Pelayar";
   }
 
-  const SESSION_KEY = "psa_license_session_v1";
-  function saveSession(data){localStorage.setItem(SESSION_KEY,JSON.stringify(data))}
+  function formatDateTime(value){
+    if(!value) return "-";
+    const d=new Date(value);
+    if(Number.isNaN(d.getTime())) return "-";
+    return d.toLocaleString("ms-MY",{
+      day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"
+    });
+  }
+
+  function formatDateOnly(value){
+    if(!value) return "-";
+    const d=new Date(value);
+    if(Number.isNaN(d.getTime())) return "-";
+    return d.toLocaleDateString("ms-MY",{day:"2-digit",month:"short",year:"numeric"});
+  }
+
+  function changeAvailabilityText(value){
+    if(!value) return "Pertukaran peranti tersedia.";
+    const d=new Date(value);
+    if(Number.isNaN(d.getTime()) || d.getTime()<=Date.now()) return "Pertukaran peranti tersedia.";
+    return `Pertukaran peranti seterusnya tersedia pada ${formatDateTime(value)}.`;
+  }
+
+  const SESSION_KEY="psa_license_session_v1";
+  function saveSession(v){localStorage.setItem(SESSION_KEY,JSON.stringify(v))}
   function loadSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||"null")}catch(e){return null}}
   function clearSession(){localStorage.removeItem(SESSION_KEY)}
 
   async function api(action,payload={}){
-    if(!cfg.apiUrl || cfg.apiUrl.startsWith("PASTE_")) throw new Error("API belum disambungkan.");
-    const res = await fetch(cfg.apiUrl,{
+    if(!cfg.apiUrl || cfg.apiUrl.startsWith("PASTE_")){
+      throw new Error("Sambungan pelayan lesen belum dikonfigurasikan.");
+    }
+    const res=await fetch(cfg.apiUrl,{
       method:"POST",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({action,env,...payload})
     });
-    const data = await res.json();
-    if(!data.ok) throw new Error(data.message || "Request gagal");
+    const data=await res.json();
+    if(!data.ok) throw new Error(data.message||"Permintaan tidak berjaya.");
     return data;
   }
 
-  function renderDevices(devices,currentId){
+  function renderDevices(devices,currentId,availableAt,changeCount){
     deviceList.innerHTML="";
+    const count=Number(changeCount||0);
+    const availableNow=!availableAt || new Date(availableAt).getTime()<=Date.now();
+
+    if(deviceChangeInfo){
+      deviceChangeInfo.textContent=`${changeAvailabilityText(availableAt)} · Jumlah pertukaran: ${count}`;
+    }
+
     if(!devices || !devices.length){
-      deviceList.innerHTML='<div class="device-meta">Tiada device aktif.</div>';
+      deviceList.innerHTML='<div class="device-meta">Tiada peranti aktif.</div>';
       return;
+    }
+
+    if(!availableNow){
+      const banner=document.createElement("div");
+      banner.className="device-limit-banner";
+      banner.textContent=`Had pertukaran peranti telah dicapai. ${changeAvailabilityText(availableAt)}`;
+      deviceList.appendChild(banner);
     }
 
     devices.forEach(d=>{
       const row=document.createElement("div");
       row.className="device-row";
-      const isCurrent=d.installId===currentId;
+      const current=d.installId===currentId;
 
       const left=document.createElement("div");
+      left.className="device-info-block";
       left.innerHTML=`
-        <div class="device-name">${d.label||"Device"}${isCurrent?'<span class="device-badge">CURRENT</span>':''}</div>
-        <div class="device-meta">Last active: ${d.lastSeen?new Date(d.lastSeen).toLocaleString():"-"}</div>
+        <div class="device-name">${d.label||"Peranti"}${current?'<span class="device-badge">SEMASA</span>':''}</div>
+        <div class="device-stats">
+          <div class="device-stat"><b>Tarikh diaktifkan:</b> ${formatDateOnly(d.createdAt)}</div>
+          <div class="device-stat"><b>Aktiviti terakhir:</b> ${formatDateTime(d.lastSeen)}</div>
+          <div class="device-stat"><b>Bilangan pertukaran:</b> ${count}</div>
+        </div>
       `;
       row.appendChild(left);
 
-      if(!isCurrent){
+      if(!current){
         const btn=document.createElement("button");
-        btn.className="device-remove";
-        btn.textContent="Remove";
-        btn.onclick=async()=>{
-          const s=loadSession();
-          if(!s)return;
-          btn.disabled=true;
-          try{
-            const result=await api("removeDevice",{
-              licenseId:s.licenseId,
-              installId:installationId(),
-              token:s.token,
-              removeInstallId:d.installId
-            });
-            renderDevices(result.devices,installationId());
-            statusEl.textContent="Device lama berjaya dibuang. Slot dah kosong.";
-          }catch(err){
-            statusEl.textContent=err.message;
-          }finally{
-            btn.disabled=false;
-          }
+        btn.className="device-change-btn";
+        btn.textContent=availableNow ? "Tukar Peranti" : "Belum Tersedia";
+        btn.disabled=!availableNow;
+        btn.onclick=()=>{
+          pendingDeviceChangeId=d.installId;
+          pendingDeviceChangeLabel=d.label||"peranti ini";
+          deviceConfirmText.textContent=`Anda akan mengeluarkan ${pendingDeviceChangeLabel} dan membuka satu slot untuk peranti baharu.`;
+          deviceConfirmModal.classList.add("show");
+          deviceConfirmModal.setAttribute("aria-hidden","false");
         };
         row.appendChild(btn);
       }
+
       deviceList.appendChild(row);
     });
   }
@@ -3579,16 +3665,13 @@ window.APP_CONFIG = {
     if(!s){gate.classList.remove("hidden");return}
     try{
       const result=await api("validateSession",{
-        licenseId:s.licenseId,
-        installId:installationId(),
-        token:s.token,
-        label:deviceLabel()
+        licenseId:s.licenseId,installId:installationId(),token:s.token,label:deviceLabel()
       });
       saveSession({licenseId:s.licenseId,token:result.token});
-      renderDevices(result.devices,installationId());
+      renderDevices(result.devices,installationId(),result.deviceChangeAvailableAt,result.deviceChangeCount);
       deviceManager.style.display="block";
       logoutBtn.style.display="block";
-      statusEl.textContent=`Access aktif • ${result.devices.length}/${MAX_DEVICES} device`;
+      statusEl.textContent=`Akses aktif • ${result.devices.length}/${MAX_DEVICES} peranti`;
       gate.classList.add("hidden");
     }catch(err){
       clearSession();
@@ -3600,21 +3683,20 @@ window.APP_CONFIG = {
   loginBtn.onclick=async()=>{
     const licenseId=idEl.value.trim().toUpperCase();
     const pin=pinEl.value.trim();
-    if(!licenseId||!pin){statusEl.textContent="Masukkan User ID dan PIN.";return}
+    if(!licenseId||!pin){
+      statusEl.textContent="Sila masukkan ID pengguna dan PIN.";
+      return;
+    }
 
     loginBtn.disabled=true;
-    statusEl.textContent="Semak access...";
+    statusEl.textContent="Menyemak akses...";
     try{
-      const result=await api("login",{
-        licenseId,pin,
-        installId:installationId(),
-        label:deviceLabel()
-      });
+      const result=await api("login",{licenseId,pin,installId:installationId(),label:deviceLabel()});
       saveSession({licenseId,token:result.token});
-      renderDevices(result.devices,installationId());
+      renderDevices(result.devices,installationId(),result.deviceChangeAvailableAt,result.deviceChangeCount);
       deviceManager.style.display="block";
       logoutBtn.style.display="block";
-      statusEl.textContent=`Access approved • ${result.devices.length}/${MAX_DEVICES} device`;
+      statusEl.textContent=`Akses diluluskan • ${result.devices.length}/${MAX_DEVICES} peranti`;
       gate.classList.add("hidden");
     }catch(err){
       statusEl.textContent=err.message;
@@ -3629,27 +3711,59 @@ window.APP_CONFIG = {
     gate.classList.remove("hidden");
     deviceManager.style.display="none";
     logoutBtn.style.display="none";
-    statusEl.textContent="Logout berjaya.";
+    statusEl.textContent="Log keluar berjaya.";
   };
 
   window.openDeviceManager=async function(){
     const s=loadSession();
     if(!s){gate.classList.remove("hidden");return}
     try{
-      const result=await api("getDevices",{
-        licenseId:s.licenseId,
-        installId:installationId(),
-        token:s.token
-      });
-      renderDevices(result.devices,installationId());
+      const result=await api("getDevices",{licenseId:s.licenseId,installId:installationId(),token:s.token});
+      renderDevices(result.devices,installationId(),result.deviceChangeAvailableAt,result.deviceChangeCount);
       deviceManager.style.display="block";
       logoutBtn.style.display="block";
-      statusEl.textContent="Manage device sendiri.";
+      statusEl.textContent="Urus peranti berdaftar.";
       gate.classList.remove("hidden");
     }catch(err){
       clearSession();
       statusEl.textContent=err.message;
       gate.classList.remove("hidden");
+    }
+  };
+
+  cancelDeviceChangeBtn.onclick=()=>{
+    pendingDeviceChangeId=null;
+    pendingDeviceChangeLabel="";
+    deviceConfirmModal.classList.remove("show");
+    deviceConfirmModal.setAttribute("aria-hidden","true");
+  };
+
+  deviceConfirmModal.addEventListener("click",e=>{
+    if(e.target===deviceConfirmModal) cancelDeviceChangeBtn.click();
+  });
+
+  confirmDeviceChangeBtn.onclick=async()=>{
+    const s=loadSession();
+    if(!s||!pendingDeviceChangeId) return;
+
+    confirmDeviceChangeBtn.disabled=true;
+    statusEl.textContent="Memproses pertukaran peranti...";
+    try{
+      const result=await api("removeDevice",{
+        licenseId:s.licenseId,
+        installId:installationId(),
+        token:s.token,
+        removeInstallId:pendingDeviceChangeId
+      });
+      renderDevices(result.devices,installationId(),result.deviceChangeAvailableAt,result.deviceChangeCount);
+      statusEl.textContent=`Peranti berjaya ditukar. ${changeAvailabilityText(result.deviceChangeAvailableAt)}`;
+      cancelDeviceChangeBtn.click();
+    }catch(err){
+      statusEl.textContent=err.message;
+      deviceConfirmModal.classList.remove("show");
+      deviceConfirmModal.setAttribute("aria-hidden","true");
+    }finally{
+      confirmDeviceChangeBtn.disabled=false;
     }
   };
 
@@ -3663,6 +3777,21 @@ if("serviceWorker" in navigator){
   window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 }
 </script>
+
+
+<div id="deviceConfirmModal" aria-hidden="true">
+  <div class="device-confirm-card">
+    <h3>Tukar peranti ini?</h3>
+    <p id="deviceConfirmText">Peranti lama akan dikeluarkan dan satu slot akan dibuka untuk peranti baharu.</p>
+    <p class="device-confirm-warning">
+      Anda hanya boleh menukar satu peranti dalam tempoh 7 hari. Selepas disahkan, pertukaran ini tidak boleh dibatalkan sehingga tarikh kelayakan seterusnya.
+    </p>
+    <div class="device-confirm-actions">
+      <button id="cancelDeviceChangeBtn" type="button">Batal</button>
+      <button id="confirmDeviceChangeBtn" type="button">Sahkan Pertukaran</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
