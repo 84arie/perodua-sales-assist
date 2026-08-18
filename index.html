@@ -3500,6 +3500,20 @@ window.addEventListener("load", () => {
 
 
 
+<div id="deviceConfirmModal" aria-hidden="true">
+  <div class="device-confirm-card">
+    <h3>Tukar peranti ini?</h3>
+    <p id="deviceConfirmText">Peranti lama akan dikeluarkan dan satu slot akan dibuka untuk peranti baharu.</p>
+    <p class="device-confirm-warning">
+      Anda hanya boleh menukar satu peranti dalam tempoh 7 hari. Selepas disahkan, pertukaran ini tidak boleh dibatalkan sehingga tarikh kelayakan seterusnya.
+    </p>
+    <div class="device-confirm-actions">
+      <button id="cancelDeviceChangeBtn" type="button">Batal</button>
+      <button id="confirmDeviceChangeBtn" type="button">Sahkan Pertukaran</button>
+    </div>
+  </div>
+</div>
+
 <script>
 window.APP_ENV = "DEV"; // DEV dahulu. Tukar ke PROD bila live.
 
@@ -3681,6 +3695,8 @@ window.APP_CONFIG = {
   }
 
   loginBtn.onclick=async()=>{
+    statusEl.textContent="Menyemak akses...";
+
     const licenseId=idEl.value.trim().toUpperCase();
     const pin=pinEl.value.trim();
     if(!licenseId||!pin){
@@ -3689,7 +3705,6 @@ window.APP_CONFIG = {
     }
 
     loginBtn.disabled=true;
-    statusEl.textContent="Menyemak akses...";
     try{
       const result=await api("login",{licenseId,pin,installId:installationId(),label:deviceLabel()});
       saveSession({licenseId,token:result.token});
@@ -3779,19 +3794,17 @@ if("serviceWorker" in navigator){
 </script>
 
 
-<div id="deviceConfirmModal" aria-hidden="true">
-  <div class="device-confirm-card">
-    <h3>Tukar peranti ini?</h3>
-    <p id="deviceConfirmText">Peranti lama akan dikeluarkan dan satu slot akan dibuka untuk peranti baharu.</p>
-    <p class="device-confirm-warning">
-      Anda hanya boleh menukar satu peranti dalam tempoh 7 hari. Selepas disahkan, pertukaran ini tidak boleh dibatalkan sehingga tarikh kelayakan seterusnya.
-    </p>
-    <div class="device-confirm-actions">
-      <button id="cancelDeviceChangeBtn" type="button">Batal</button>
-      <button id="confirmDeviceChangeBtn" type="button">Sahkan Pertukaran</button>
-    </div>
-  </div>
-</div>
+
+
+
+<script>
+window.addEventListener("error", function(e){
+  const status = document.getElementById("accessStatus");
+  if(status && !document.getElementById("accessGate")?.classList.contains("hidden")){
+    status.textContent = "Ralat sistem akses dikesan. Sila muat semula aplikasi. Jika masalah berterusan, hubungi pentadbir.";
+  }
+});
+</script>
 
 </body>
 </html>
