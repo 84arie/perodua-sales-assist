@@ -1,5 +1,5 @@
 
-const CACHE="psa-prod-v1-2-device-response-fix";
+const CACHE="psa-prod-pwa-final-v1";
 const CORE=["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install",event=>{
