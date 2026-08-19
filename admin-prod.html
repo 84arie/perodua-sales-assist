@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#003B7A">
+<title>PERODUA SALES ASSIST — Admin Lesen</title>
+<style>
+:root{
+  --blue:#003B7A;--blue2:#0057A3;--red:#D71E28;--green:#2FA84F;
+  --bg:#F4F7FB;--card:#fff;--text:#152033;--muted:#68778B;--line:#D7E0EA;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,#f8fbff,#eef3f8);color:var(--text)
+}
+.top{height:8px;background:linear-gradient(90deg,var(--blue) 0 70%,var(--green) 70% 84%,var(--red) 84%)}
+.wrap{width:min(1100px,calc(100% - 28px));margin:0 auto;padding:24px 0 40px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}
+h1{margin:0;font-size:26px;color:var(--blue);font-weight:950;letter-spacing:.03em}
+.sub{font-size:12px;color:var(--muted);margin-top:4px}
+.badge{padding:7px 10px;border-radius:999px;background:#eef4f9;color:var(--blue);font-size:10px;font-weight:900}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 14px 30px rgba(0,59,122,.08);margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+label{display:block;font-size:10px;text-transform:uppercase;font-weight:900;color:#526176;margin-bottom:6px;letter-spacing:.04em}
+input,textarea,select{
+  width:100%;border:1px solid #ccd7e3;border-radius:12px;padding:12px;font-size:14px;background:#fff;color:var(--text)
+}
+textarea{min-height:44px;resize:vertical}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+button{border:0;border-radius:11px;padding:11px 13px;font-size:12px;font-weight:900;cursor:pointer}
+.primary{background:linear-gradient(90deg,var(--green),#238c42);color:#fff}
+.blue{background:linear-gradient(90deg,var(--blue),var(--blue2));color:#fff}
+.secondary{background:#eef4f9;color:var(--blue)}
+.danger{background:#fff0f1;color:#b51f28;border:1px solid #efc8cb}
+.warn{background:#fff7eb;color:#805116;border:1px solid #ecd6b4}
+.status{font-size:12px;padding:10px 12px;border-radius:11px;background:#f6f8fb;color:#516175;border:1px solid #e0e6ec;margin-top:12px}
+.hidden{display:none!important}
+.login-card{width:min(420px,100%);margin:70px auto 0}
+.login-title{font-size:22px;font-weight:950;color:var(--blue);margin:0 0 4px}
+.result{
+  margin-top:14px;padding:14px;border-radius:14px;background:#f3fbf6;border:1px solid #cdebd7
+}
+.result strong{color:#176c38}
+.result-code{font-size:19px;font-weight:950;letter-spacing:.04em;color:var(--blue);margin-top:5px}
+.toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.search{max-width:330px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:9px;text-transform:uppercase;color:#68778b;padding:9px;border-bottom:1px solid var(--line)}
+td{padding:10px 9px;border-bottom:1px solid #edf1f4;vertical-align:top}
+.pill{display:inline-block;padding:3px 7px;border-radius:999px;font-size:9px;font-weight:900}
+.active{background:#e9f8ee;color:#18723b}
+.disabled{background:#fff0f1;color:#ad2028}
+.row-actions{display:flex;gap:5px;flex-wrap:wrap}
+.row-actions button{padding:6px 8px;font-size:9px;border-radius:8px}
+.footer{text-align:center;color:#7a8796;font-size:10px;line-height:1.5;margin-top:22px}
+@media(max-width:760px){
+  .grid{grid-template-columns:1fr}
+  header{align-items:flex-start;flex-direction:column}
+  .toolbar{align-items:stretch;flex-direction:column}
+  .search{max-width:none}
+  .table-wrap{overflow-x:auto}
+  table{min-width:800px}
+}
+</style>
+</head>
+<body>
+<div class="top"></div>
+<div class="wrap">
+
+<section id="loginSection" class="login-card card">
+  <div class="badge">PENTADBIR PROD</div>
+  <h2 class="login-title">Pentadbiran Lesen</h2>
+  <div class="sub">PERODUA SALES ASSIST · ZYNORA</div>
+  <div style="margin-top:16px">
+    <label>PIN Pentadbir</label>
+    <input id="adminPin" type="password" placeholder="Masukkan PIN pentadbir">
+  </div>
+  <button id="adminLoginBtn" class="blue" style="width:100%;margin-top:12px">Log Masuk Pentadbir</button>
+  <div id="loginStatus" class="status">Sila log masuk untuk mengurus lesen.</div>
+</section>
+
+<section id="adminApp" class="hidden">
+<header>
+  <div>
+    <h1>PERODUA SALES ASSIST</h1>
+    <div class="sub">Pentadbiran Lesen · 1 pengguna = maksimum 2 peranti</div>
+  </div>
+  <div class="actions" style="margin:0">
+    <span class="badge">PROD</span>
+    <button id="refreshBtn" class="secondary">Muat Semula</button>
+    <button id="adminLogoutBtn" class="secondary">Log Keluar</button>
+  </div>
+</header>
+
+<div class="card">
+  <h3 style="margin:0 0 12px;color:var(--blue)">Cipta Lesen Pelanggan</h3>
+  <div class="grid">
+    <div>
+      <label>Nama Pelanggan</label>
+      <input id="customerName" placeholder="Contoh: Nur Aina">
+    </div>
+    <div>
+      <label>E-mel (Pilihan)</label>
+      <input id="customerEmail" type="email" placeholder="customer@email.com">
+    </div>
+    <div>
+      <label>Catatan (Pilihan)</label>
+      <input id="customerNotes" placeholder="Contoh: Lifetime License">
+    </div>
+  </div>
+  <button id="createLicenseBtn" class="primary" style="margin-top:12px">Jana ID + PIN</button>
+
+  <div id="newLicenseResult" class="result hidden">
+    <div><strong>Lesen berjaya dicipta.</strong></div>
+    <div class="result-code" id="generatedId">—</div>
+    <div class="result-code" id="generatedPin">—</div>
+    <div class="actions">
+      <button id="copyCredentialBtn" class="blue">Salin Maklumat Akses</button>
+    </div>
+    <div class="status" style="margin-top:10px;background:#fff9ec;border-color:#ecd9ad;color:#75531a">
+      PIN hanya dipaparkan pada masa ia dijana. Simpan atau salin maklumat akses sebelum meninggalkan halaman ini.
+    </div>
+  </div>
+  <div id="createStatus" class="status">Isi nama pelanggan untuk mencipta lesen baharu.</div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div>
+      <h3 style="margin:0;color:var(--blue)">Senarai Lesen</h3>
+      <div class="sub">Aktifkan, nyahaktifkan atau reset hanya apabila diperlukan.</div>
+    </div>
+    <input id="searchInput" class="search" placeholder="Cari ID atau nama pelanggan">
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Pelanggan</th>
+          <th>Status</th>
+          <th>Peranti</th>
+          <th>Pertukaran</th>
+          <th>Kemas Kini</th>
+          <th>Tindakan Admin</th>
+        </tr>
+      </thead>
+      <tbody id="licenseRows"></tbody>
+    </table>
+  </div>
+  <div id="listStatus" class="status">Memuatkan senarai lesen...</div>
+</div>
+
+<div class="footer">
+  © 2026 ZYNORA. All Rights Reserved.<br>
+  <strong>Built for Real Life · Smart Tools. Simple Life.</strong>
+</div>
+</section>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwEMehVmsxAAoJd4XmPKA93tFWiOU0q9_xgW6b5QAJBB6VOFZVDphXb4opkzmyL_rIK/exec";
+const ENV = "PROD";
+let adminToken = sessionStorage.getItem("psa_admin_token") || "";
+let allLicenses = [];
+let lastGenerated = null;
+
+const $ = id => document.getElementById(id);
+
+async function api(action,payload={}){
+  const res = await fetch(API_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({action,env:ENV,adminToken,...payload})
+  });
+  const data = await res.json();
+  if(!data.ok) throw new Error(data.message || "Permintaan tidak berjaya.");
+  return data;
+}
+
+function showAdmin(){
+  $("loginSection").classList.add("hidden");
+  $("adminApp").classList.remove("hidden");
+}
+
+function showLogin(){
+  $("adminApp").classList.add("hidden");
+  $("loginSection").classList.remove("hidden");
+}
+
+$("adminLoginBtn").onclick = async ()=>{
+  const pin = $("adminPin").value.trim();
+  if(!pin){$("loginStatus").textContent="Sila masukkan PIN pentadbir.";return}
+  $("loginStatus").textContent="Menyemak akses pentadbir...";
+  try{
+    const data = await api("adminLogin",{adminPin:pin});
+    adminToken = data.adminToken;
+    sessionStorage.setItem("psa_admin_token",adminToken);
+    showAdmin();
+    await loadLicenses();
+  }catch(err){
+    $("loginStatus").textContent=err.message;
+  }
+};
+
+$("adminLogoutBtn").onclick = ()=>{
+  adminToken="";
+  sessionStorage.removeItem("psa_admin_token");
+  showLogin();
+  $("adminPin").value="";
+  $("loginStatus").textContent="Anda telah log keluar.";
+};
+
+$("createLicenseBtn").onclick = async ()=>{
+  const customerName=$("customerName").value.trim();
+  if(!customerName){$("createStatus").textContent="Nama pelanggan diperlukan.";return}
+  $("createStatus").textContent="Mencipta lesen...";
+  try{
+    const data=await api("adminCreateLicense",{
+      customerName,
+      email:$("customerEmail").value.trim(),
+      notes:$("customerNotes").value.trim()
+    });
+    lastGenerated=data;
+    $("generatedId").textContent=`ID: ${data.licenseId}`;
+    $("generatedPin").textContent=`PIN: ${data.pin}`;
+    $("newLicenseResult").classList.remove("hidden");
+    $("createStatus").textContent=`Lesen ${data.licenseId} berjaya dicipta.`;
+    $("customerName").value="";
+    $("customerEmail").value="";
+    $("customerNotes").value="";
+    await loadLicenses();
+  }catch(err){
+    $("createStatus").textContent=err.message;
+  }
+};
+
+$("copyCredentialBtn").onclick = async ()=>{
+  if(!lastGenerated) return;
+  const text =
+`PERODUA SALES ASSIST
+
+ID Pengguna: ${lastGenerated.licenseId}
+PIN: ${lastGenerated.pin}
+
+Akses lesen: maksimum 2 peranti aktif.
+Pertukaran satu peranti dibenarkan sekali dalam tempoh 7 hari.`;
+  try{
+    await navigator.clipboard.writeText(text);
+    $("createStatus").textContent="Maklumat login telah disalin.";
+  }catch(e){
+    $("createStatus").textContent=text;
+  }
+};
+
+async function loadLicenses(){
+  $("listStatus").textContent="Memuatkan senarai lesen...";
+  try{
+    const data=await api("adminListLicenses");
+    allLicenses=data.licenses||[];
+    renderLicenses();
+    $("listStatus").textContent=`${allLicenses.length} lesen ditemui.`;
+  }catch(err){
+    if(String(err.message).includes("pentadbir")){
+      adminToken="";
+      sessionStorage.removeItem("psa_admin_token");
+      showLogin();
+    }
+    $("listStatus").textContent=err.message;
+  }
+}
+
+function fmt(v){
+  if(!v) return "—";
+  const d=new Date(v);
+  if(Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleString("ms-MY",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+}
+
+function renderLicenses(){
+  const q=$("searchInput").value.trim().toLowerCase();
+  const rows=allLicenses.filter(x=>
+    !q || x.licenseId.toLowerCase().includes(q) || (x.customerName||"").toLowerCase().includes(q)
+  );
+
+  $("licenseRows").innerHTML=rows.map(x=>`
+    <tr>
+      <td><strong>${x.licenseId}</strong></td>
+      <td>${x.customerName||"—"}<div class="sub">${x.email||""}</div></td>
+      <td><span class="pill ${x.status==="ACTIVE"?"active":"disabled"}">${x.status==="ACTIVE"?"AKTIF":"DISABLED"}</span></td>
+      <td>${x.activeDevices}/${x.maxDevices}</td>
+      <td>${x.deviceChangeCount||0}<div class="sub">${x.lastDeviceChangeAt?("Terakhir: "+fmt(x.lastDeviceChangeAt)):"Belum pernah"}</div></td>
+      <td>${fmt(x.updatedAt)}</td>
+      <td>
+        <div class="row-actions">
+          ${x.status==="ACTIVE"
+            ? `<button class="danger" onclick="setStatus('${x.licenseId}','DISABLED')">Nyahaktifkan</button>`
+            : `<button class="primary" onclick="setStatus('${x.licenseId}','ACTIVE')">Aktifkan</button>`}
+          <button class="warn" onclick="overrideCooldown('${x.licenseId}')">Buka Sekatan 7 Hari</button>
+          <button class="secondary" onclick="resetPin('${x.licenseId}')">Reset PIN</button>
+          <button class="secondary" onclick="resetDevices('${x.licenseId}')">Reset Semua Peranti</button>
+        </div>
+      </td>
+    </tr>
+  `).join("") || `<tr><td colspan="7">Tiada lesen ditemui.</td></tr>`;
+}
+
+async function setStatus(id,status){
+  if(!confirm(`${status==="DISABLED"?"Nyahaktifkan":"Aktifkan"} lesen ${id}?`)) return;
+  try{
+    await api("adminSetStatus",{licenseId:id,status});
+    await loadLicenses();
+  }catch(err){alert(err.message)}
+}
+
+async function resetDevices(id){
+  if(!confirm(`Reset semua peranti untuk ${id}? Gunakan fungsi ini hanya untuk kes khas.`)) return;
+  try{
+    await api("adminResetDevices",{licenseId:id});
+    await loadLicenses();
+  }catch(err){alert(err.message)}
+}
+
+async function overrideCooldown(id){
+  if(!confirm(`Buka sekatan pertukaran 7 hari untuk ${id}? Gunakan fungsi ini hanya untuk kes khas.`)) return;
+  try{
+    await api("adminOverrideCooldown",{licenseId:id});
+    await loadLicenses();
+  }catch(err){alert(err.message)}
+}
+
+
+async function resetPin(id){
+  if(!confirm(`Jana PIN baharu untuk ${id}? PIN lama tidak lagi boleh digunakan selepas tindakan ini.`)) return;
+  try{
+    const data=await api("adminResetPin",{licenseId:id});
+    lastGenerated={licenseId:data.licenseId,pin:data.pin};
+    $("generatedId").textContent=`ID: ${data.licenseId}`;
+    $("generatedPin").textContent=`PIN BAHARU: ${data.pin}`;
+    $("newLicenseResult").classList.remove("hidden");
+    $("createStatus").textContent=`PIN baharu untuk ${data.licenseId} berjaya dijana. Salin PIN ini sekarang.`;
+    window.scrollTo({top:0,behavior:"smooth"});
+    await loadLicenses();
+  }catch(err){alert(err.message)}
+}
+
+$("refreshBtn").onclick=loadLicenses;
+$("searchInput").oninput=renderLicenses;
+
+if(adminToken){
+  showAdmin();
+  loadLicenses();
+}else{
+  showLogin();
+}
+</script>
+</body>
+</html>
