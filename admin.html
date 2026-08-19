@@ -70,14 +70,14 @@ td{padding:10px 9px;border-bottom:1px solid #edf1f4;vertical-align:top}
 <div class="wrap">
 
 <section id="loginSection" class="login-card card">
-  <div class="badge">DEV ADMIN</div>
-  <h2 class="login-title">Admin License Generator</h2>
+  <div class="badge">PENTADBIR DEV</div>
+  <h2 class="login-title">Pentadbiran Lesen</h2>
   <div class="sub">PERODUA SALES ASSIST · ZYNORA</div>
   <div style="margin-top:16px">
     <label>PIN Pentadbir</label>
     <input id="adminPin" type="password" placeholder="Masukkan PIN pentadbir">
   </div>
-  <button id="adminLoginBtn" class="blue" style="width:100%;margin-top:12px">Log Masuk Admin</button>
+  <button id="adminLoginBtn" class="blue" style="width:100%;margin-top:12px">Log Masuk Pentadbir</button>
   <div id="loginStatus" class="status">Sila log masuk untuk mengurus lesen.</div>
 </section>
 
@@ -85,7 +85,7 @@ td{padding:10px 9px;border-bottom:1px solid #edf1f4;vertical-align:top}
 <header>
   <div>
     <h1>PERODUA SALES ASSIST</h1>
-    <div class="sub">Admin License Generator · 1 pengguna = maksimum 2 peranti</div>
+    <div class="sub">Pentadbiran Lesen · 1 pengguna = maksimum 2 peranti</div>
   </div>
   <div class="actions" style="margin:0">
     <span class="badge">DEV</span>
@@ -110,14 +110,17 @@ td{padding:10px 9px;border-bottom:1px solid #edf1f4;vertical-align:top}
       <input id="customerNotes" placeholder="Contoh: Lifetime License">
     </div>
   </div>
-  <button id="createLicenseBtn" class="primary" style="margin-top:12px">Generate ID + PIN</button>
+  <button id="createLicenseBtn" class="primary" style="margin-top:12px">Jana ID + PIN</button>
 
   <div id="newLicenseResult" class="result hidden">
     <div><strong>Lesen berjaya dicipta.</strong></div>
     <div class="result-code" id="generatedId">—</div>
     <div class="result-code" id="generatedPin">—</div>
     <div class="actions">
-      <button id="copyCredentialBtn" class="blue">Salin Maklumat Login</button>
+      <button id="copyCredentialBtn" class="blue">Salin Maklumat Akses</button>
+    </div>
+    <div class="status" style="margin-top:10px;background:#fff9ec;border-color:#ecd9ad;color:#75531a">
+      PIN hanya dipaparkan pada masa ia dijana. Simpan atau salin maklumat akses sebelum meninggalkan halaman ini.
     </div>
   </div>
   <div id="createStatus" class="status">Isi nama pelanggan untuk mencipta lesen baharu.</div>
@@ -242,8 +245,8 @@ $("copyCredentialBtn").onclick = async ()=>{
 ID Pengguna: ${lastGenerated.licenseId}
 PIN: ${lastGenerated.pin}
 
-Maksimum 2 peranti.
-Pertukaran peranti dibenarkan sekali setiap 7 hari.`;
+Akses lesen: maksimum 2 peranti aktif.
+Pertukaran satu peranti dibenarkan sekali dalam tempoh 7 hari.`;
   try{
     await navigator.clipboard.writeText(text);
     $("createStatus").textContent="Maklumat login telah disalin.";
@@ -293,10 +296,11 @@ function renderLicenses(){
       <td>
         <div class="row-actions">
           ${x.status==="ACTIVE"
-            ? `<button class="danger" onclick="setStatus('${x.licenseId}','DISABLED')">Disable</button>`
-            : `<button class="primary" onclick="setStatus('${x.licenseId}','ACTIVE')">Enable</button>`}
-          <button class="warn" onclick="overrideCooldown('${x.licenseId}')">Buka Cooldown</button>
-          <button class="secondary" onclick="resetDevices('${x.licenseId}')">Reset Peranti</button>
+            ? `<button class="danger" onclick="setStatus('${x.licenseId}','DISABLED')">Nyahaktifkan</button>`
+            : `<button class="primary" onclick="setStatus('${x.licenseId}','ACTIVE')">Aktifkan</button>`}
+          <button class="warn" onclick="overrideCooldown('${x.licenseId}')">Buka Sekatan 7 Hari</button>
+          <button class="secondary" onclick="resetPin('${x.licenseId}')">Reset PIN</button>
+          <button class="secondary" onclick="resetDevices('${x.licenseId}')">Reset Semua Peranti</button>
         </div>
       </td>
     </tr>
@@ -304,7 +308,7 @@ function renderLicenses(){
 }
 
 async function setStatus(id,status){
-  if(!confirm(`${status==="DISABLED"?"Nyahaktifkan":"Aktifkan"} ${id}?`)) return;
+  if(!confirm(`${status==="DISABLED"?"Nyahaktifkan":"Aktifkan"} lesen ${id}?`)) return;
   try{
     await api("adminSetStatus",{licenseId:id,status});
     await loadLicenses();
@@ -312,7 +316,7 @@ async function setStatus(id,status){
 }
 
 async function resetDevices(id){
-  if(!confirm(`Reset SEMUA peranti untuk ${id}? Gunakan hanya untuk kes khas.`)) return;
+  if(!confirm(`Reset semua peranti untuk ${id}? Gunakan fungsi ini hanya untuk kes khas.`)) return;
   try{
     await api("adminResetDevices",{licenseId:id});
     await loadLicenses();
@@ -320,9 +324,24 @@ async function resetDevices(id){
 }
 
 async function overrideCooldown(id){
-  if(!confirm(`Buka sekatan pertukaran 7 hari untuk ${id}? Gunakan hanya untuk kes khas.`)) return;
+  if(!confirm(`Buka sekatan pertukaran 7 hari untuk ${id}? Gunakan fungsi ini hanya untuk kes khas.`)) return;
   try{
     await api("adminOverrideCooldown",{licenseId:id});
+    await loadLicenses();
+  }catch(err){alert(err.message)}
+}
+
+
+async function resetPin(id){
+  if(!confirm(`Jana PIN baharu untuk ${id}? PIN lama tidak lagi boleh digunakan selepas tindakan ini.`)) return;
+  try{
+    const data=await api("adminResetPin",{licenseId:id});
+    lastGenerated={licenseId:data.licenseId,pin:data.pin};
+    $("generatedId").textContent=`ID: ${data.licenseId}`;
+    $("generatedPin").textContent=`PIN BAHARU: ${data.pin}`;
+    $("newLicenseResult").classList.remove("hidden");
+    $("createStatus").textContent=`PIN baharu untuk ${data.licenseId} berjaya dijana. Salin PIN ini sekarang.`;
+    window.scrollTo({top:0,behavior:"smooth"});
     await loadLicenses();
   }catch(err){alert(err.message)}
 }
