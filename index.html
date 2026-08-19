@@ -3684,15 +3684,16 @@ window.APP_CONFIG = {
         licenseId:s.licenseId,installId:installationId(),token:s.token,label:deviceLabel()
       });
       saveSession({licenseId:s.licenseId,token:result.token});
-      renderDevices(result.devices,installationId(),result.deviceChangeAvailableAt,result.deviceChangeCount);
+      const devices=Array.isArray(result.devices) ? result.devices : [];
+      renderDevices(devices,installationId(),result.deviceChangeAvailableAt,result.deviceChangeCount);
       deviceManager.style.display="block";
       logoutBtn.style.display="block";
-      statusEl.textContent=`Akses aktif • ${result.devices.length}/${MAX_DEVICES} peranti`;
+      statusEl.textContent=`Akses aktif • ${devices.length}/${MAX_DEVICES} peranti`;
       gate.classList.add("hidden");
     }catch(err){
       clearSession();
       gate.classList.remove("hidden");
-      statusEl.textContent=err.message;
+      statusEl.textContent=err?.message || "Akses tidak dapat diproses. Sila cuba semula.";
     }
   }
 
@@ -3708,15 +3709,36 @@ window.APP_CONFIG = {
 
     loginBtn.disabled=true;
     try{
-      const result=await api("login",{licenseId,pin,installId:installationId(),label:deviceLabel()});
-      saveSession({licenseId,token:result.token});
-      renderDevices(result.devices,installationId(),result.deviceChangeAvailableAt,result.deviceChangeCount);
+      const loginResult=await api("login",{licenseId,pin,installId:installationId(),label:deviceLabel()});
+      saveSession({licenseId,token:loginResult.token});
+
+      let result=loginResult;
+      if(!Array.isArray(result.devices)){
+        try{
+          result=await api("getDevices",{
+            licenseId,
+            installId:installationId(),
+            token:loginResult.token,
+            label:deviceLabel()
+          });
+        }catch(fetchErr){
+          result=loginResult;
+        }
+      }
+
+      const devices=Array.isArray(result.devices) ? result.devices : [];
+      renderDevices(
+        devices,
+        installationId(),
+        result.deviceChangeAvailableAt || loginResult.deviceChangeAvailableAt,
+        result.deviceChangeCount ?? loginResult.deviceChangeCount
+      );
       deviceManager.style.display="block";
       logoutBtn.style.display="block";
-      statusEl.textContent=`Akses diluluskan • ${result.devices.length}/${MAX_DEVICES} peranti`;
+      statusEl.textContent=`Akses diluluskan • ${devices.length}/${MAX_DEVICES} peranti`;
       gate.classList.add("hidden");
     }catch(err){
-      statusEl.textContent=err.message;
+      statusEl.textContent=err?.message || "Akses tidak dapat diproses. Sila cuba semula.";
       deviceManager.style.display="none";
     }finally{
       loginBtn.disabled=false;
@@ -3743,7 +3765,7 @@ window.APP_CONFIG = {
       gate.classList.remove("hidden");
     }catch(err){
       clearSession();
-      statusEl.textContent=err.message;
+      statusEl.textContent=err?.message || "Akses tidak dapat diproses. Sila cuba semula.";
       gate.classList.remove("hidden");
     }
   };
@@ -3776,7 +3798,7 @@ window.APP_CONFIG = {
       statusEl.textContent=`Peranti berjaya ditukar. ${changeAvailabilityText(result.deviceChangeAvailableAt)}`;
       cancelDeviceChangeBtn.click();
     }catch(err){
-      statusEl.textContent=err.message;
+      statusEl.textContent=err?.message || "Akses tidak dapat diproses. Sila cuba semula.";
       deviceConfirmModal.classList.remove("show");
       deviceConfirmModal.setAttribute("aria-hidden","true");
     }finally{
