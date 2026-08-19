@@ -3554,6 +3554,8 @@ window.APP_CONFIG = {
 
   envBadge.textContent = env;
   document.title = cfg.appName;
+  idEl.value = "";
+  pinEl.value = "";
 
   function installationId(){
     const key = "psa_installation_id_v1";
@@ -3599,9 +3601,9 @@ window.APP_CONFIG = {
   }
 
   const SESSION_KEY="psa_license_session_v1";
-  function saveSession(v){localStorage.setItem(SESSION_KEY,JSON.stringify(v))}
-  function loadSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||"null")}catch(e){return null}}
-  function clearSession(){localStorage.removeItem(SESSION_KEY)}
+  function saveSession(v){sessionStorage.setItem(SESSION_KEY,JSON.stringify(v))}
+  function loadSession(){try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||"null")}catch(e){return null}}
+  function clearSession(){sessionStorage.removeItem(SESSION_KEY)}
 
   async function api(action,payload={}){
     if(!cfg.apiUrl || cfg.apiUrl.startsWith("PASTE_")){
@@ -3782,7 +3784,13 @@ window.APP_CONFIG = {
     }
   };
 
-  validateSavedSession();
+  // Security policy: every fresh app/page launch requires ID + PIN.
+  // Device registration remains stored separately via installationId() in localStorage.
+  clearSession();
+  gate.classList.remove("hidden");
+  deviceManager.style.display="none";
+  logoutBtn.style.display="none";
+  statusEl.textContent="Sila log masuk untuk mengakses aplikasi.";
 })();
 </script>
 
