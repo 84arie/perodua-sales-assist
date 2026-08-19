@@ -1,5 +1,5 @@
 
-const CACHE="psa-prod-v1";
+const CACHE="psa-prod-v1-1-api-fix";
 const CORE=["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install",event=>{
