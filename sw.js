@@ -1,5 +1,5 @@
 
-const CACHE="psa-v3-3-login-every-open";
+const CACHE="psa-prod-v1";
 const CORE=["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install",event=>{
